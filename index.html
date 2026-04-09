@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#6B46C1">
+    <meta name="description" content="Sussurro - Uma rede social anônima e segura para desabafos, conselhos e reflexões">
+    
+    <!-- ÍCONES PWA -->
+    <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Sussurro" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/icons/site.webmanifest" />
+    
+    <title>Sussurro</title>
+    
+    <style>
+        /* ========================================
+           VARIÁVEIS E RESET
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient-start: #0f0c29;
+            --bg-gradient-mid: #302b63;
+            --bg-gradient-end: #24243e;
+            --card-bg: rgba(30, 27, 58, 0.95);
+            --card-border: rgba(139, 92, 246, 0.3);
+            --primary: #8B5CF6;
+            --primary-dark: #6D28D9;
+            --primary-light: #A78BFA;
+            --secondary: #EC4899;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --text-primary: #F3F4F6;
+            --text-secondary: #D1D5DB;
+            --text-muted: #9CA3AF;
+            --border-color: rgba(139, 92, 246, 0.2);
+            --hover-bg: rgba(139, 92, 246, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* ========================================
+           LAYOUT PRINCIPAL
+           ======================================== */
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .app-header {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-header h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* ========================================
+           CARDS E POSTS
+           ======================================== */
+        .post-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
+            margin: 1rem;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .post-author {
+            flex: 1;
+        }
+
+        .post-author-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .post-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .post-content {
+            margin: 1rem 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .categories-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.75rem 0;
+        }
+
+        .category-badge {
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 1rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            color: var(--primary-light);
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--hover-bg);
+            color: var(--primary-light);
+        }
+
+        .action-btn.liked {
+            color: var(--secondary);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ========================================
+           FORMULÁRIOS E INPUTS
+           ======================================== */
+        .input-field, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--primary-light);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+
+        /* FAB Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            z-index: 90;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+        }
+
+        .fab svg {
+            width: 28px;
+            height: 28px;
+            stroke: white;
+            stroke-width: 2;
+        }
+
+        /* ========================================
+           MODAIS
+           ======================================== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--card-border);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* ========================================
+           TOASTS
+           ======================================== */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            z-index: 1100;
+            animation: slideUp 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        /* ========================================
+           LOADING
+           ======================================== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========================================
+           RESPONSIVIDADE
+           ======================================== */
+        @media (max-width: 640px) {
+            .app-header h1 {
+                font-size: 1.25rem;
+            }
+            
+            .post-card {
+                margin: 0.75rem;
+                padding: 0.75rem;
+            }
+            
+            .fab {
+                bottom: 1rem;
+                right: 1rem;
+                width: 48px;
+                height: 48px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 1rem;
+            }
+        }
+
+        /* ========================================
+           UTILITÁRIOS
+           ======================================== */
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .avatar-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .avatar-option.selected {
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .filter-bar {
+            padding: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .character-counter {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 0.25rem;
+        }
+
+        .category-counter {
+            font-size: 0.75rem;
+            color: var(--primary-light);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p>Carregando Sussurro...</p>
+        </div>
+        <div id="main-container" style="display: none;"></div>
+    </div>
+    <div id="modal-container"></div>
+    <div id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    
+    <script>
+        // ========================================
+        // SUPABASE CONFIGURAÇÃO
+        // ========================================
+        const SUPABASE_URL = 'https://cqwmcpcbsvhewjxnyiou.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxd21jcGNic3ZoZXdqeG55aW91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2OTI0MjksImV4cCI6MjA5MTI2ODQyOX0.j73kPR8nVpbHZSnLP621osSnJTRo5FlSUSFOgKIH3_E';
+
+        // Criar cliente Supabase (APENAS UMA VEZ)
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Verificar conexão
+        console.log('✅ Supabase inicializado');
+
+        // ========================================
+        // VARIÁVEIS GLOBAIS
+        // ========================================
+        let currentProfile = null;
+        let myAccountIds = [];
+        let currentFilters = { order: 'recent', category: 'all', search: '' };
+        let currentPage = 0;
+        let isLoading = false;
+        let hasMore = true;
+
+        const AVATARS = ['🎮', '🎯', '🎨', '🎭', '🎪', '🎲', '🎸', '🎹', '🎺', '🎻', '🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🌟', '⭐', '🌙', '☀️'];
+        const CATEGORIES = ['Desabafo', 'Conselho', 'Reflexão', 'Dia a dia', 'Acontecimentos diários', 'Irrelevante'];
+
+        // ========================================
+        // FUNÇÕES DE UI
+        // ========================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showModal(content, title = '') {
+            const container = document.getElementById('modal-container');
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>${title}</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">${content}</div>
+                </div>
+            `;
+            modal.querySelector('.modal-close').onclick = () => modal.remove();
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            container.appendChild(modal);
+            return modal;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function hideInitialLoading() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-container').style.display = 'block';
+        }
+
+        // ========================================
+        // FUNÇÕES DO SUPABASE
+        // ========================================
+        async function createProfile(name, password, avatar, bio = '') {
+            const passwordHash = CryptoJS.SHA256(password).toString();
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .insert([{ name: name.trim(), password_hash: passwordHash, avatar: avatar, bio: bio.trim() || null }])
+                .select().single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function loginProfile(profileId, password) {
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('id, name, avatar, bio, password_hash')
+                .eq('id', profileId).single();
+            if (error) throw error;
+            const passwordHash = CryptoJS.SHA256(password).toString();
+            if (profile.password_hash !== passwordHash) throw new Error('Senha incorreta');
+            return profile;
+        }
+
+        async function getAllProfiles() {
+            const { data, error } = await supabaseClient.from('profiles').select('id, name, avatar').order('name');
+            if (error) throw error;
+            return data;
+        }
+
+        async function getProfileById(profileId) {
+            const { data, error } = await supabaseClient.from('profiles').select('id, name, avatar, bio, created_at').eq('id', profileId).single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function updateProfile(profileId, updates) {
+            const { data, error } = await supabaseClient.from('profiles').update(updates).eq('id', profileId).select().single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function deleteProfile(profileId) {
+            await supabaseClient.from('likes').delete().eq('profile_id', profileId);
+            await supabaseClient.from('comments').delete().eq('profile_id', profileId);
+            await supabaseClient.from('reports').delete().eq('profile_id', profileId);
+            await supabaseClient.from('posts').delete().eq('profile_id', profileId);
+            const { error } = await supabaseClient.from('profiles').delete().eq('id', profileId);
+            if (error) throw error;
+        }
+
+        async function createPost(profileId, content, categories) {
+            const { data, error } = await supabaseClient
+                .from('posts')
+                .insert([{ profile_id: profileId, content: content.trim(), categories: categories }])
+                .select(`*, profiles:profile_id (id, name, avatar)`).single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function getPosts(filters = {}, page = 0, limit = 20) {
+            let query = supabaseClient
+                .from('posts')
+                .select(`*, profiles:profile_id (id, name, avatar), likes:likes (count), comments:comments (count)`, { count: 'exact' });
+            
+            if (filters.order === 'popular') {
+                query = query.order('likes_count', { ascending: false });
+            } else {
+                query = query.order('created_at', { ascending: false });
+            }
+            if (filters.category && filters.category !== 'all') query = query.contains('categories', [filters.category]);
+            if (filters.search) query = query.ilike('content', `%${filters.search}%`);
+            if (filters.profileId) query = query.eq('profile_id', filters.profileId);
+            
+            const { data, error } = await query.range(page * limit, (page + 1) * limit - 1);
+            if (error) throw error;
+            
+            const posts = data.map(post => ({
+                ...post,
+                likes_count: post.likes[0]?.count || 0,
+                comments_count: post.comments[0]?.count || 0
+            }));
+            return { posts, count: posts.length };
+        }
+
+        async function deletePost(postId) {
+            await supabaseClient.from('likes').delete().eq('post_id', postId);
+            await supabaseClient.from('comments').delete().eq('post_id', postId);
+            await supabaseClient.from('reports').delete().eq('post_id', postId);
+            const { error } = await supabaseClient.from('posts').delete().eq('id', postId);
+            if (error) throw error;
+        }
+
+        async function likePost(postId, profileId) {
+            const { error } = await supabaseClient.from('likes').insert([{ post_id: postId, profile_id: profileId }]);
+            if (error) throw error;
+        }
+
+        async function unlikePost(postId, profileId) {
+            const { error } = await supabaseClient.from('likes').delete().eq('post_id', postId).eq('profile_id', profileId);
+            if (error) throw error;
+        }
+
+        async function hasLikedPost(postId, profileId) {
+            const { data, error } = await supabaseClient.from('likes').select('id').eq('post_id', postId).eq('profile_id', profileId).maybeSingle();
+            if (error) throw error;
+            return !!data;
+        }
+
+        async function getPostLikes(postId) {
+            const { data, error } = await supabaseClient.from('likes').select(`profiles:profile_id (id, name, avatar)`).eq('post_id', postId);
+            if (error) throw error;
+            return data.map(item => item.profiles);
+        }
+
+        async function removeLikeByOwner(postId, likerProfileId) {
+            const { error } = await supabaseClient.from('likes').delete().eq('post_id', postId).eq('profile_id', likerProfileId);
+            if (error) throw error;
+        }
+
+        async function createComment(postId, profileId, content, parentId = null) {
+            const { data, error } = await supabaseClient
+                .from('comments')
+                .insert([{ post_id: postId, profile_id: profileId, content: content.trim(), parent_id: parentId }])
+                .select(`*, profiles:profile_id (id, name, avatar)`).single();
+            if (error) throw error;
+            return data;
+        }
+
+        async function getPostComments(postId) {
+            const { data, error } = await supabaseClient
+                .from('comments')
+                .select(`*, profiles:profile_id (id, name, avatar), replies:comments!parent_id (*, profiles:profile_id (id, name, avatar))`)
+                .eq('post_id', postId)
+                .is('parent_id', null)
+                .order('created_at', { ascending: true });
+            if (error) throw error;
+            return data;
+        }
+
+        async function deleteComment(commentId) {
+            await supabaseClient.from('comments').delete().eq('parent_id', commentId);
+            const { error } = await supabaseClient.from('comments').delete().eq('id', commentId);
+            if (error) throw error;
+        }
+
+        async function reportPost(postId, profileId) {
+            const { error } = await supabaseClient.from('reports').insert([{ post_id: postId, profile_id: profileId }]);
+            if (error) throw error;
+        }
+
+        async function hasReportedPost(postId, profileId) {
+            const { data, error } = await supabaseClient.from('reports').select('id').eq('post_id', postId).eq('profile_id', profileId).maybeSingle();
+            if (error) throw error;
+            return !!data;
+        }
+
+        // ========================================
+        // TELAS DE AUTENTICAÇÃO
+        // ========================================
+        function showLoginScreen() {
+            hideInitialLoading();
+            document.getElementById('main-container').innerHTML = `
+                <div class="app-container">
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="font-size: 4rem;">🤫</div>
+                        <h1 style="font-size: 2rem; margin: 1rem 0;">Sussurro</h1>
+                        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Um espaço seguro para desabafos e conselhos anônimos 💙</p>
+                        <button class="btn" onclick="window.showCreateProfile()">Criar Perfil</button>
+                        <button class="btn btn-secondary" onclick="window.showProfileList()" style="margin-top: 1rem;">Entrar em Perfil</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.showProfileList = async () => {
+            try {
+                const profiles = await getAllProfiles();
+                document.getElementById('main-container').innerHTML = `
+                    <div class="app-container">
+                        <div class="app-header"><h1>Escolher Perfil</h1><button class="modal-close" onclick="showLoginScreen()">✕</button></div>
+                        <div style="padding: 1rem;">
+                            ${profiles.map(p => `<div class="post-card" onclick="showLoginPassword('${p.id}', '${escapeHtml(p.name)}', '${p.avatar}')" style="cursor:pointer;display:flex;align-items:center;gap:1rem;"><div style="font-size:3rem;">${p.avatar}</div><div><strong>${escapeHtml(p.name)}</strong></div></div>`).join('')}
+                            <button class="btn btn-secondary" style="margin-top:1rem;width:100%;" onclick="window.showCreateProfile()">Criar novo perfil</button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                showToast('Erro ao carregar perfis: ' + error.message, 'error');
+            }
+        };
+
+        window.showLoginPassword = (profileId, profileName, profileAvatar) => {
+            showModal(`<div style="text-align:center;"><div style="font-size:4rem;">${profileAvatar}</div><h3>${escapeHtml(profileName)}</h3><input type="password" id="login-password" class="input-field" placeholder="Digite sua senha" style="margin:1rem 0;"><button class="btn" onclick="performLogin('${profileId}')">Entrar</button></div>`, 'Login');
+        };
+
+        window.performLogin = async (profileId) => {
+            const password = document.getElementById('login-password')?.value;
+            if (!password) { showToast('Digite a senha', 'error'); return; }
+            try {
+                const profile = await loginProfile(profileId, password);
+                if (!myAccountIds.includes(profile.id)) { myAccountIds.push(profile.id); localStorage.setItem('sussurro_accounts', JSON.stringify(myAccountIds)); }
+                currentProfile = profile;
+                localStorage.setItem('sussurro_current_profile', JSON.stringify(profile));
+                document.querySelector('.modal')?.remove();
+                await initApp();
+                showToast(`Bem-vindo(a), ${profile.name}!`, 'success');
+            } catch (error) { showToast(error.message, 'error'); }
+        };
+
+        window.showCreateProfile = () => {
+            showModal(`<div style="text-align:center;"><h3>Criar Novo Perfil</h3><div class="avatar-grid" id="avatar-grid">${AVATARS.map(a => `<div class="avatar-option" onclick="selectAvatar('${a}')">${a}</div>`).join('')}</div><input type="text" id="profile-name" class="input-field" placeholder="Nome do perfil" style="margin:0.5rem 0;"><input type="password" id="profile-password" class="input-field" placeholder="Senha (mínimo 4 caracteres)" style="margin:0.5rem 0;"><textarea id="profile-bio" class="input-field" placeholder="Bio (opcional)" rows="3"></textarea><button class="btn" onclick="createNewProfile()" style="margin-top:1rem;">Criar Perfil</button></div>`, 'Novo Perfil');
+            window.selectedAvatar = AVATARS[0];
+            document.querySelector('.avatar-option')?.classList.add('selected');
+        };
+
+        window.selectAvatar = (avatar) => {
+            window.selectedAvatar = avatar;
+            document.querySelectorAll('.avatar-option').forEach(el => { el.classList.remove('selected'); if (el.textContent === avatar) el.classList.add('selected'); });
+        };
+
+        window.createNewProfile = async () => {
+            const name = document.getElementById('profile-name')?.value.trim();
+            const password = document.getElementById('profile-password')?.value;
+            const bio = document.getElementById('profile-bio')?.value;
+            if (!name) { showToast('Digite um nome', 'error'); return; }
+            if (!password || password.length < 4) { showToast('A senha deve ter no mínimo 4 caracteres', 'error'); return; }
+            try {
+                const profile = await createProfile(name, password, window.selectedAvatar, bio);
+                document.querySelector('.modal')?.remove();
+                myAccountIds.push(profile.id);
+                localStorage.setItem('sussurro_accounts', JSON.stringify(myAccountIds));
+                currentProfile = profile;
+                localStorage.setItem('sussurro_current_profile', JSON.stringify(profile));
+                await initApp();
+                showToast('Perfil criado com sucesso!', 'success');
+            } catch (error) { showToast('Erro ao criar perfil: ' + error.message, 'error'); }
+        };
+
+        // ========================================
+        // APLICAÇÃO PRINCIPAL
+        // ========================================
+        async function initApp() {
+            hideInitialLoading();
+            currentPage = 0;
+            hasMore = true;
+            await renderCurrentView();
+        }
+
+        async function renderCurrentView() {
+            document.getElementById('main-container').innerHTML = `
+                <div class="app-container">
+                    <div class="app-header"><h1>Sussurro</h1><div class="header-buttons"><button class="action-btn" onclick="window.showMyProfile()" style="font-size:2rem;">${currentProfile.avatar}</button></div></div>
+                    <div class="filter-bar">
+                        <button class="filter-btn ${currentFilters.order === 'recent' ? 'active' : ''}" onclick="changeOrder('recent')">Recentes</button>
+                        <button class="filter-btn ${currentFilters.order === 'popular' ? 'active' : ''}" onclick="changeOrder('popular')">Populares</button>
+                        <select id="category-filter" class="filter-btn" onchange="changeCategory(this.value)"><option value="all">Todas</option>${CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('')}</select>
+                        <input type="text" id="search-input" class="filter-btn" placeholder="Buscar..." style="flex:1;" value="${escapeHtml(currentFilters.search)}">
+                        <button class="filter-btn" onclick="searchPosts()">🔍</button>
+                    </div>
+                    <div id="feed-container"></div>
+                    <button class="fab" onclick="window.showCreatePostModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+                </div>
+            `;
+            await loadFeed();
+        }
+
+        async function loadFeed(append = false) {
+            if (isLoading) return;
+            if (!append) { currentPage = 0; hasMore = true; }
+            if (!hasMore && append) return;
+            isLoading = true;
+            if (!append) document.getElementById('feed-container').innerHTML = '<div class="loading-spinner" style="margin:2rem auto;"></div>';
+            try {
+                const { posts } = await getPosts(currentFilters, currentPage);
+                if (posts.length === 0 && currentPage === 0) {
+                    document.getElementById('feed-container').innerHTML = `<div class="empty-state"><div>🤫</div><h3>Nenhum sussurro por aqui</h3><p>Seja o primeiro a compartilhar algo!</p><button class="btn" onclick="window.showCreatePostModal()" style="margin-top:1rem;">Criar primeiro post</button></div>`;
+                    isLoading = false; return;
+                }
+                hasMore = posts.length === 20;
+                const postsHtml = await Promise.all(posts.map(post => renderPostCard(post)));
+                if (append) document.getElementById('feed-container').insertAdjacentHTML('beforeend', postsHtml.join(''));
+                else document.getElementById('feed-container').innerHTML = postsHtml.join('');
+                if (hasMore && posts.length > 0) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-secondary';
+                    btn.textContent = 'Carregar mais';
+                    btn.style.margin = '1rem auto';
+                    btn.style.display = 'block';
+                    btn.onclick = () => { currentPage++; loadFeed(true); };
+                    document.getElementById('feed-container').appendChild(btn);
+                }
+                currentPage++;
+            } catch (error) { showToast('Erro ao carregar feed: ' + error.message, 'error'); }
+            isLoading = false;
+        }
+
+        async function renderPostCard(post) {
+            const isLiked = await hasLikedPost(post.id, currentProfile.id);
+            const isOwner = post.profile_id === currentProfile.id;
+            const hasReported = await hasReportedPost(post.id, currentProfile.id);
+            const date = new Date(post.created_at);
+            const formattedDate = date.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            return `<div class="post-card"><div class="post-header" onclick="viewProfile('${post.profile_id}')"><div style="font-size:2.5rem;">${post.profiles.avatar}</div><div class="post-author"><div class="post-author-name">${escapeHtml(post.profiles.name)}</div><div class="post-date">${formattedDate}</div></div></div><div class="post-content">${escapeHtml(post.content)}</div><div class="categories-container">${post.categories.map(c => `<span class="category-badge">${escapeHtml(c)}</span>`).join('')}</div><div class="post-actions"><button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}', this)">❤️ ${post.likes_count}</button><button class="action-btn" onclick="showComments('${post.id}')">💬 ${post.comments_count}</button>${!isOwner ? `<button class="action-btn" onclick="reportPost('${post.id}', this)" ${hasReported ? 'disabled' : ''}>${hasReported ? '✓ Denunciado' : '🚩 Denunciar'}</button>` : `<button class="action-btn" onclick="showLikesModal('${post.id}')">👥 Ver quem curtiu</button><button class="action-btn" onclick="deletePostModal('${post.id}')">🗑️ Excluir</button>`}</div></div>`;
+        }
+
+        // ========================================
+        // FUNÇÕES GLOBAIS
+        // ========================================
+        window.toggleLike = async (postId, btn) => {
+            const isLiked = btn.classList.contains('liked');
+            try {
+                if (isLiked) await unlikePost(postId, currentProfile.id);
+                else await likePost(postId, currentProfile.id);
+                const count = parseInt(btn.textContent.match(/\d+/)[0]);
+                btn.textContent = `${isLiked ? '❤️' : '❤️'} ${isLiked ? count - 1 : count + 1}`;
+                if (isLiked) btn.classList.remove('liked');
+                else btn.classList.add('liked');
+            } catch (error) { showToast('Erro ao curtir', 'error'); }
+        };
+
+        window.showLikesModal = async (postId) => {
+            try {
+                const likes = await getPostLikes(postId);
+                if (likes.length === 0) { showToast('Ninguém curtiu este post ainda', 'info'); return; }
+                showModal(`<div>${likes.map(l => `<div style="display:flex;justify-content:space-between;padding:0.5rem;border-bottom:1px solid var(--border-color);"><div><div style="font-size:2rem;">${l.avatar}</div><strong>${escapeHtml(l.name)}</strong></div><button class="action-btn" onclick="removeLike('${postId}', '${l.id}')">Remover like</button></div>`).join('')}</div>`, 'Quem curtiu');
+            } catch (error) { showToast('Erro ao carregar likes', 'error'); }
+        };
+
+        window.removeLike = async (postId, likerId) => {
+            try {
+                await removeLikeByOwner(postId, likerId);
+                document.querySelector('.modal')?.remove();
+                await loadFeed();
+                showToast('Like removido!', 'success');
+            } catch (error) { showToast('Erro ao remover like', 'error'); }
+        };
+
+        window.showComments = async (postId) => {
+            try {
+                const { data: post } = await supabaseClient.from('posts').select('*, profiles(*)').eq('id', postId).single();
+                const comments = await getPostComments(postId);
+                const modal = showModal(`<div><div class="post-card"><div style="display:flex;gap:0.5rem;"><div style="font-size:2rem;">${post.profiles.avatar}</div><strong>${escapeHtml(post.profiles.name)}</strong></div><p>${escapeHtml(post.content)}</p></div><div id="comments-list">${comments.map(c => renderComment(c, postId)).join('')}</div><div><textarea id="new-comment" class="input-field" placeholder="Comentário..." rows="2" maxlength="250"></textarea><div class="character-counter">0/250</div><button class="btn" onclick="addComment('${postId}')">Comentar</button></div></div>`, 'Comentários');
+                const ta = modal.querySelector('#new-comment');
+                const counter = modal.querySelector('.character-counter');
+                ta?.addEventListener('input', () => counter.textContent = `${ta.value.length}/250`);
+            } catch (error) { showToast('Erro ao carregar comentários', 'error'); }
+        };
+
+        function renderComment(comment, postId, depth = 0) {
+            const date = new Date(comment.created_at);
+            const formattedDate = date.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+            return `<div class="post-card" style="margin-left:${depth * 1.5}rem;"><div style="display:flex;justify-content:space-between;"><div style="display:flex;gap:0.5rem;"><div style="font-size:1.5rem;">${comment.profiles.avatar}</div><div><strong onclick="viewProfile('${comment.profile_id}')" style="cursor:pointer;">${escapeHtml(comment.profiles.name)}</strong><div style="font-size:0.75rem;color:var(--text-muted);">${formattedDate}</div></div></div><button class="action-btn" onclick="deleteComment('${comment.id}', '${postId}')">🗑️</button></div><p>${escapeHtml(comment.content)}</p><button class="action-btn" onclick="showReplyForm('${comment.id}', '${postId}')">↪️ Responder</button>${comment.replies?.length ? `<div>${comment.replies.map(r => renderComment(r, postId, depth + 1)).join('')}</div>` : ''}</div>`;
+        }
+
+        window.addComment = async (postId, parentId = null) => {
+            const ta = document.querySelector('#new-comment');
+            const content = ta?.value.trim();
+            if (!content) { showToast('Digite um comentário', 'error'); return; }
+            if (content.length > 250) { showToast('Máximo 250 caracteres', 'error'); return; }
+            try {
+                await createComment(postId, currentProfile.id, content, parentId);
+                if (ta) ta.value = '';
+                document.querySelector('.modal')?.remove();
+                window.showComments(postId);
+                showToast('Comentário adicionado!', 'success');
+            } catch (error) { showToast('Erro ao comentar', 'error'); }
+        };
+
+        window.showReplyForm = (commentId, postId) => {
+            const modal = showModal(`<textarea id="reply-content" class="input-field" placeholder="Resposta..." rows="2" maxlength="250"></textarea><div class="character-counter">0/250</div><button class="btn" onclick="addReply('${commentId}', '${postId}')">Responder</button>`, 'Responder');
+            const ta = modal.querySelector('#reply-content');
+            const counter = modal.querySelector('.character-counter');
+            ta?.addEventListener('input', () => counter.textContent = `${ta.value.length}/250`);
+        };
+
+        window.addReply = async (commentId, postId) => {
+            const content = document.querySelector('#reply-content')?.value.trim();
+            if (!content) { showToast('Digite uma resposta', 'error'); return; }
+            try {
+                await createComment(postId, currentProfile.id, content, commentId);
+                document.querySelector('.modal')?.remove();
+                window.showComments(postId);
+                showToast('Resposta adicionada!', 'success');
+            } catch (error) { showToast('Erro ao responder', 'error'); }
+        };
+
+        window.deleteComment = async (commentId, postId) => {
+            if (confirm('Excluir este comentário?')) {
+                try { await deleteComment(commentId); window.showComments(postId); showToast('Comentário excluído!', 'success'); }
+                catch (error) { showToast('Erro ao excluir', 'error'); }
+            }
+        };
+
+        window.reportPost = async (postId, btn) => {
+            try {
+                await reportPost(postId, currentProfile.id);
+                btn.textContent = '✓ Denunciado';
+                btn.disabled = true;
+                showToast('Post denunciado!', 'success');
+            } catch (error) { showToast('Erro ao denunciar', 'error'); }
+        };
+
+        window.deletePostModal = (postId) => {
+            showModal(`<p>Tem certeza?</p><p style="color:var(--danger);">Esta ação é irreversível!</p><div style="display:flex;gap:1rem;"><button class="btn btn-danger" onclick="confirmDeletePost('${postId}')">Excluir</button><button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancelar</button></div>`, 'Excluir Post');
+        };
+
+        window.confirmDeletePost = async (postId) => {
+            try {
+                await deletePost(postId);
+                document.querySelector('.modal')?.remove();
+                await loadFeed();
+                showToast('Post excluído!', 'success');
+            } catch (error) { showToast('Erro ao excluir', 'error'); }
+        };
+
+        window.showCreatePostModal = () => {
+            showModal(`<textarea id="post-content" class="input-field" placeholder="O que você está pensando?" rows="4" maxlength="500"></textarea><div class="character-counter">0/500</div><div style="margin:1rem 0;"><label>Categorias</label><div class="avatar-grid" style="grid-template-columns:repeat(2,1fr);">${CATEGORIES.map(c => `<label style="display:flex;align-items:center;gap:0.5rem;"><input type="checkbox" value="${c}" class="category-checkbox">${c}</label>`).join('')}</div><div id="category-counter" class="category-counter">0 categorias selecionadas</div></div><button class="btn" onclick="createNewPost()">Publicar</button>`, 'Novo Sussurro');
+            const ta = document.querySelector('#post-content');
+            const counter = document.querySelector('.character-counter');
+            ta?.addEventListener('input', () => counter.textContent = `${ta.value.length}/500`);
+            const cbs = document.querySelectorAll('.category-checkbox');
+            const catCounter = document.querySelector('#category-counter');
+            cbs.forEach(cb => cb.addEventListener('change', () => catCounter.textContent = `${Array.from(cbs).filter(c => c.checked).length} categorias selecionadas`));
+        };
+
+        window.createNewPost = async () => {
+            const content = document.querySelector('#post-content')?.value.trim();
+            const selected = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.value);
+            if (!content) { showToast('Digite algo', 'error'); return; }
+            if (!selected.length) { showToast('Selecione uma categoria', 'error'); return; }
+            try {
+                await createPost(currentProfile.id, content, selected);
+                document.querySelector('.modal')?.remove();
+                currentPage = 0;
+                await loadFeed();
+                showToast('Post publicado!', 'success');
+            } catch (error) { showToast('Erro ao publicar', 'error'); }
+        };
+
+        window.showMyProfile = async () => await viewProfile(currentProfile.id);
+
+        window.viewProfile = async (profileId) => {
+            try {
+                const profile = await getProfileById(profileId);
+                const { posts } = await getPosts({ profileId }, 0, 100);
+                const isOwn = profileId === currentProfile.id;
+                document.getElementById('main-container').innerHTML = `<div class="app-container"><div class="app-header"><button class="action-btn" onclick="initApp()">← Voltar</button><h1>Perfil</h1><div></div></div><div style="text-align:center;padding:2rem;"><div style="font-size:5rem;">${profile.avatar}</div><h2>${escapeHtml(profile.name)}</h2>${profile.bio ? `<p>${escapeHtml(profile.bio)}</p>` : ''}<p>${posts.length} sussurros</p>${isOwn ? `<div style="margin-top:1rem;"><button class="btn btn-secondary" onclick="showEditProfile()">Editar</button><button class="btn btn-secondary" onclick="showSwitchAccount()">Trocar Conta</button><button class="btn btn-danger" onclick="logout()">Sair</button><button class="btn btn-danger" onclick="deleteAccountModal()">Excluir Conta</button></div>` : ''}</div><div id="profile-posts"></div></div>`;
+                const container = document.getElementById('profile-posts');
+                if (!posts.length) container.innerHTML = `<div class="empty-state"><div>🤫</div><p>Nenhum sussurro</p></div>`;
+                else container.innerHTML = (await Promise.all(posts.map(p => renderPostCard(p)))).join('');
+            } catch (error) { showToast('Erro ao carregar perfil', 'error'); }
+        };
+
+        window.showEditProfile = () => {
+            showModal(`<div style="text-align:center;"><div style="font-size:3rem;cursor:pointer;" onclick="changeAvatar()" id="current-avatar">${currentProfile.avatar}</div><input type="text" id="edit-name" class="input-field" value="${escapeHtml(currentProfile.name)}"><textarea id="edit-bio" class="input-field" placeholder="Bio" rows="3">${escapeHtml(currentProfile.bio || '')}</textarea><button class="btn" onclick="saveProfileChanges()">Salvar</button></div>`, 'Editar Perfil');
+            window.avatarIndex = AVATARS.indexOf(currentProfile.avatar);
+        };
+
+        window.changeAvatar = () => {
+            window.avatarIndex = (window.avatarIndex + 1) % AVATARS.length;
+            const div = document.getElementById('current-avatar');
+            if (div) div.textContent = AVATARS[window.avatarIndex];
+        };
+
+        window.saveProfileChanges = async () => {
+            const name = document.getElementById('edit-name')?.value.trim();
+            const bio = document.getElementById('edit-bio')?.value;
+            const avatar = document.getElementById('current-avatar')?.textContent;
+            if (!name) { showToast('Nome obrigatório', 'error'); return; }
+            try {
+                currentProfile = await updateProfile(currentProfile.id, { name, bio, avatar });
+                localStorage.setItem('sussurro_current_profile', JSON.stringify(currentProfile));
+                document.querySelector('.modal')?.remove();
+                await viewProfile(currentProfile.id);
+                showToast('Perfil atualizado!', 'success');
+            } catch (error) { showToast('Erro ao atualizar', 'error'); }
+        };
+
+        window.showSwitchAccount = () => {
+            showModal(`<div><p>Escolha uma conta:</p><div id="accounts-list"></div><button class="btn btn-secondary" onclick="window.showCreateProfile()">Criar nova conta</button></div>`, 'Trocar Conta');
+            loadAccountsList();
+        };
+
+        async function loadAccountsList() {
+            const container = document.getElementById('accounts-list');
+            if (!container) return;
+            container.innerHTML = '<div class="loading-spinner"></div>';
+            try {
+                const profiles = await getAllProfiles();
+                const userAccounts = profiles.filter(p => myAccountIds.includes(p.id));
+                container.innerHTML = userAccounts.map(p => `<div class="post-card" style="cursor:pointer;" onclick="switchToAccount('${p.id}')"><div style="display:flex;gap:1rem;"><div style="font-size:2rem;">${p.avatar}</div><div><strong>${escapeHtml(p.name)}</strong>${p.id === currentProfile.id ? ' (atual)' : ''}</div></div></div>`).join('');
+            } catch (error) { container.innerHTML = '<p>Erro ao carregar</p>'; }
+        }
+
+        window.switchToAccount = async (profileId) => {
+            try {
+                const profile = await getProfileById(profileId);
+                currentProfile = profile;
+                localStorage.setItem('sussurro_current_profile', JSON.stringify(profile));
+                document.querySelector('.modal')?.remove();
+                await initApp();
+                showToast(`Bem-vindo(a), ${profile.name}!`, 'success');
+            } catch (error) { showToast('Erro ao trocar conta', 'error'); }
+        };
+
+        window.logout = () => {
+            if (confirm('Sair da conta?')) {
+                localStorage.removeItem('sussurro_current_profile');
+                currentProfile = null;
+                showLoginScreen();
+                showToast('Você saiu', 'success');
+            }
+        };
+
+        window.deleteAccountModal = () => {
+            showModal(`<p style="color:var(--danger);">⚠️ ATENÇÃO: Irreversível!</p><p>Digite <strong>EXCLUIR</strong>:</p><input type="text" id="confirm-delete" class="input-field"><button class="btn btn-danger" onclick="confirmDeleteAccount()">Excluir</button>`, 'Excluir Conta');
+        };
+
+        window.confirmDeleteAccount = async () => {
+            const confirmText = document.getElementById('confirm-delete')?.value;
+            if (confirmText !== 'EXCLUIR') { showToast('Digite EXCLUIR', 'error'); return; }
+            try {
+                await deleteProfile(currentProfile.id);
+                myAccountIds = myAccountIds.filter(id => id !== currentProfile.id);
+                localStorage.setItem('sussurro_accounts', JSON.stringify(myAccountIds));
+                localStorage.removeItem('sussurro_current_profile');
+                document.querySelector('.modal')?.remove();
+                showLoginScreen();
+                showToast('Conta excluída', 'success');
+            } catch (error) { showToast('Erro ao excluir', 'error'); }
+        };
+
+        window.changeOrder = (order) => { currentFilters.order = order; currentPage = 0; loadFeed(); };
+        window.changeCategory = (category) => { currentFilters.category = category; currentPage = 0; loadFeed(); };
+        window.searchPosts = () => { currentFilters.search = document.getElementById('search-input')?.value || ''; currentPage = 0; loadFeed(); };
+        window.viewProfile = viewProfile;
+        window.initApp = initApp;
+
+        // ========================================
+        // INICIALIZAÇÃO
+        // ========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            const saved = localStorage.getItem('sussurro_accounts');
+            if (saved) myAccountIds = JSON.parse(saved);
+            const savedProfile = localStorage.getItem('sussurro_current_profile');
+            if (savedProfile && myAccountIds.length) {
+                currentProfile = JSON.parse(savedProfile);
+                await initApp();
+            } else showLoginScreen();
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW falhou:', err));
+            }
+        });
+    </script>
+</body>
+</html>
